@@ -6,7 +6,6 @@ const Hypercore = require("hypercore");
 const Hyperbee = require("hyperbee");
 const crypto = require("crypto");
 const Auction = require("./model/auction");
-const { data } = require("hypercore-crypto");
 const auctions = new Map();
 const connectedClients = new Set();
 
@@ -133,13 +132,6 @@ const main = async () => {
       return Buffer.from(JSON.stringify({ error: error.message }), "utf-8");
     }
   });
-
-  // process.on("SIGINT", async () => {
-  //   console.log("\nGracefully shutting down from SIGINT (Ctrl+C)");
-  //   await rpcServer.close();
-  //   await dht.destroy();
-  //   process.exit();
-  // });
 };
 
 main().catch(console.error);

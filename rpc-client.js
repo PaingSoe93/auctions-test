@@ -9,7 +9,6 @@ const readline = require("readline");
 
 let rpc;
 let serverPubKey;
-let rpcServer;
 
 const main = async () => {
   serverPubKey = Buffer.from(process.argv[2], "hex");
@@ -130,7 +129,7 @@ const cli = async () => {
         break;
 
       case "closeAuction":
-        const closeAuctionId = args[4];
+        const closeAuctionId = args[1];
         const highestBidAfterClosure = await closeAuction(closeAuctionId);
         console.log(
           "Highest bid after auction closure:",
