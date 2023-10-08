@@ -9,9 +9,23 @@ const auctions = new Map();
 const rpcServer = new RPC();
 
 const main = async () => {
-  const feed = hypercore("./db/auction-log");
+  const feed = new hypercore("./db/auction-log");
 
-  await new Promise((resolve) => feed.ready(resolve));
+  console.log("Initializing feed...");
+
+  await new Promise((resolve, reject) => {
+    feed.ready((err) => {
+      if (err) {
+        console.error("Error initializing feed:", err);
+        reject(err);
+        return;
+      }
+      console.log("Feed initialized.");
+      resolve();
+    });
+  });
+
+  console.log(`Server public key: ${feed.key.toString("hex")}`);
 
   swarm.join(feed.discoveryKey, {
     lookup: true,
