@@ -39,28 +39,6 @@ const main = async () => {
 
   rpc = new RPC({ dht });
 
-  rpcServer = rpc.createServer();
-
-  await rpcServer.listen();
-
-  rpcServer.respond("auctionCreated", async (dataRaw) => {
-    const data = JSON.parse(dataRaw.toString("utf-8"));
-    console.log("Notification received: Auction created:", data);
-    return Buffer.from("Received", "utf-8");
-  });
-
-  rpcServer.respond("bidMade", async (dataRaw) => {
-    const data = JSON.parse(dataRaw.toString("utf-8"));
-    console.log("Notification received: Bid made:", data);
-    return Buffer.from("Received", "utf-8");
-  });
-
-  rpcServer.respond("auctionClosed", async (dataRaw) => {
-    const data = JSON.parse(dataRaw.toString("utf-8"));
-    console.log("Notification received: Auction closed:", data);
-    return Buffer.from("Received", "utf-8");
-  });
-
   const payload = { nonce: 126 };
   const payloadRaw = Buffer.from(JSON.stringify(payload), "utf-8");
 

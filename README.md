@@ -46,7 +46,7 @@ createAuction <clientId> <itemName> <startingPrice>
 Example
 
 ```
-createAuction client123 "TestItem" 100
+createAuction client123 TestItem 100
 ```
 
 Get Active Auctions
