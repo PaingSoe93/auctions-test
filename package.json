@@ -1,0 +1,19 @@
+{
+  "name": "auctions-test",
+  "version": "1.0.0",
+  "description": "auctions test",
+  "main": "rpc-client.js",
+  "scripts": {
+    "start:server": "node rpc-server.js",
+    "start:client": "node rpc-client.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Paing Soe Aung",
+  "license": "ISC",
+  "dependencies": {
+    "@hyperswarm/network": "2.1.0",
+    "@hyperswarm/rpc": "3.2.2",
+    "hypercore": "10.28.11",
+    "hyperswarm": "4.7.3"
+  }
+}
