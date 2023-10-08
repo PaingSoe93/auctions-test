@@ -176,8 +176,6 @@ const main = async () => {
     swarm.destroy((err) => {
       if (err) console.error("Error shutting down swarm:", err);
       else console.log("Swarm shut down successfully.");
-
-      // Only exit after all cleanup logic has completed
       process.exit();
     });
   });
