@@ -32,7 +32,7 @@
   dependencies:
     sodium-native "^3.1.1"
 
-"@hyperswarm/network@^2.1.0":
+"@hyperswarm/network@2.1.0":
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@hyperswarm/network/-/network-2.1.0.tgz#88cbc9edbe08db01e3ff399678fb38d220eed172"
   integrity sha512-TvRRRd//a3q+JhpSh5PaHJfnP4oLM/0eZikyDh2Z+eaJpIZP+vZwdlpPd10neTsPq1zfJX8weRjYLFHNpoMZVg==
@@ -41,7 +41,7 @@
     nanoresource "^1.3.0"
     utp-native "^2.2.1"
 
-"@hyperswarm/rpc@^3.2.2":
+"@hyperswarm/rpc@3.2.2":
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/@hyperswarm/rpc/-/rpc-3.2.2.tgz#b3ec70c60dff24878e96aa7060373fa77163d410"
   integrity sha512-Ysw8jHk0pvJR4vhXZb706SOk0HWI2uX2A/2BdgGpZQL78yRuE2QTbJmdC42sWynYzTeFrZSW2ZwE2YOwuhyGDg==
@@ -69,7 +69,7 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-b4a@^1.0.1, b4a@^1.1.0, b4a@^1.1.1, b4a@^1.3.0, b4a@^1.3.1, b4a@^1.5.0, b4a@^1.5.3, b4a@^1.6.0, b4a@^1.6.1, b4a@^1.6.4:
+b4a@^1.0.1, b4a@^1.1.0, b4a@^1.1.1, b4a@^1.3.0, b4a@^1.3.1, b4a@^1.5.0, b4a@^1.5.3, b4a@^1.6.0, b4a@^1.6.1, b4a@^1.6.3, b4a@^1.6.4:
   version "1.6.4"
   resolved "https://registry.yarnpkg.com/b4a/-/b4a-1.6.4.tgz#ef1c1422cae5ce6535ec191baeed7567443f36c9"
   integrity sha512-fpWrvyVHEKyeEvbKZTVOeZF3VSKKWtJxFIxX/jaVPf+cLbGUSitjb49pHLqPV2BUNNZ0LcoeEGfE/YCpyDYHIw==
@@ -143,6 +143,13 @@ codecs@^2.0.0:
   resolved "https://registry.yarnpkg.com/codecs/-/codecs-2.2.0.tgz#9efe60f367482a9f9d69b4daebb73b421038ab37"
   integrity sha512-+xi2ENsvchtUNa8oBUU58gHgmyN6BEEeZ8NIEgeQ0XnC+AoyihivgZYe+OOiNi+fLy/NUowugwV5gP8XWYDm0Q==
 
+codecs@^3.0.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/codecs/-/codecs-3.1.0.tgz#34509aea31c34985b91aed07edbc3ff233b61f6e"
+  integrity sha512-Dqx8NwvBvnMeuPQdVKy/XEF71igjR5apxBvCGeV0pP1tXadOiaLvDTXt7xh+/5wI1ASB195mXQGJbw3Ml4YDWQ==
+  dependencies:
+    b4a "^1.6.3"
+
 compact-encoding-bitfield@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/compact-encoding-bitfield/-/compact-encoding-bitfield-1.0.0.tgz#39f923263dffb68b266b6cb9dc0bae2d42cf5c4a"
@@ -178,6 +185,11 @@ crc-universal@^1.0.2:
   integrity sha512-CE9xWEI6Gd5V0Bdmj5NoWH3d7+EIe4zUpy1sv6uvKYznzsDP1vhiWsTBmL6q9IrH2P6RRshp+8AkhR4CMtY5Hg==
   optionalDependencies:
     crc-native "^1.0.3"
+
+debounceify@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/debounceify/-/debounceify-1.0.0.tgz#182889d32bab2dbcc0ad76861f9332f4a6509ff1"
+  integrity sha512-7BeSMAPUohdDJ7sU6Tq2M8HkJR05IqQCeVm/qNemrpOgP5SGZD5WeNOXNfsgbESinz6OjMooWPTGZiKUX91XJQ==
 
 debugging-stream@^2.0.0:
   version "2.0.0"
@@ -266,6 +278,21 @@ hashlru@^2.3.0:
   resolved "https://registry.yarnpkg.com/hashlru/-/hashlru-2.3.0.tgz#5dc15928b3f6961a2056416bb3a4910216fdfb51"
   integrity sha512-0cMsjjIC8I+D3M44pOQdsy0OHXGLVz6Z0beRuufhKa0KfaD2wGwAev6jILzXsd3/vpnNQJmWyZtIILqM1N+n5A==
 
+hyperbee@^2.15.1:
+  version "2.15.1"
+  resolved "https://registry.yarnpkg.com/hyperbee/-/hyperbee-2.15.1.tgz#b460640054822afd32f35d55f8ed02c2f25e9c12"
+  integrity sha512-5lfnhCRh6hr1F7s+k08OEp2MIKwSo77jUS4NFxjyqlNDDoeUGvmTa/HLXgBzPEqgWiTA/cFq0gdL4qCY7XjPyw==
+  dependencies:
+    b4a "^1.6.0"
+    codecs "^3.0.0"
+    debounceify "^1.0.0"
+    hypercore-errors "^1.0.0"
+    mutexify "^1.4.0"
+    protocol-buffers-encodings "^1.2.0"
+    ready-resource "^1.0.0"
+    safety-catch "^1.0.2"
+    streamx "^2.12.4"
+
 hypercore-crypto@^3.2.1, hypercore-crypto@^3.3.0, hypercore-crypto@^3.3.1:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/hypercore-crypto/-/hypercore-crypto-3.4.0.tgz#aff1893efc7b7ec5d1dfdc4270033fd94e18b96d"
@@ -275,7 +302,7 @@ hypercore-crypto@^3.2.1, hypercore-crypto@^3.3.0, hypercore-crypto@^3.3.1:
     compact-encoding "^2.5.1"
     sodium-universal "^4.0.0"
 
-hypercore-errors@^1.1.0:
+hypercore-errors@^1.0.0, hypercore-errors@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/hypercore-errors/-/hypercore-errors-1.1.0.tgz#1a3a49364f56951f93b4d4741fd90e8d9b006496"
   integrity sha512-pclEHYUmgveqyMObMrgwJ087VvqcRVfbaY7k9rNQ5C+3MADVSQu3f8SmoLkntDkOipm9+uELK3p8DbTGL54m8g==
@@ -288,7 +315,7 @@ hypercore-id-encoding@^1.2.0:
     b4a "^1.5.3"
     z32 "^1.0.0"
 
-hypercore@^10.28.11:
+hypercore@10.28.11:
   version "10.28.11"
   resolved "https://registry.yarnpkg.com/hypercore/-/hypercore-10.28.11.tgz#7436b2c84059d6039b829dda665ca2b5c9dad2b4"
   integrity sha512-r+Qw/4IJvOrkz+eiOUTPQxM5vnIEzUT57w7m0XowYz19SOFVWhI7NEXnOmz0kneGhMWQ2u//Lv3iXgp8O9XJTw==
@@ -315,7 +342,7 @@ hypercore@^10.28.11:
     xache "^1.1.0"
     z32 "^1.0.0"
 
-hyperdht@^6.6.0, hyperdht@^6.7.0:
+hyperdht@^6.6.0, hyperdht@^6.7.0, hyperdht@^6.8.9:
   version "6.8.9"
   resolved "https://registry.yarnpkg.com/hyperdht/-/hyperdht-6.8.9.tgz#70ae3702a5e4b1753c801ab82eb9fe47222fdc50"
   integrity sha512-iyeBKyXnb9VqjEVKwYEjbibmCXte0b8F1pV5s6VdokCFLfxAB2Qd03SRhVoKwuCCM8vmz/pDPEM61fVR5UBeug==
@@ -337,7 +364,7 @@ hyperdht@^6.6.0, hyperdht@^6.7.0:
     sodium-universal "^4.0.0"
     xache "^1.1.0"
 
-hyperswarm@^4.7.3:
+hyperswarm@4.7.3:
   version "4.7.3"
   resolved "https://registry.yarnpkg.com/hyperswarm/-/hyperswarm-4.7.3.tgz#e2b834cde3db81d96feedd70c67b16400b715aaa"
   integrity sha512-wrXu8dCwTdc2hxrfwL0NGTDa0MT9zVR5RlWvX6OoFu3ywHnmzqsU3kHpfBoaWVMteoMFXT9aSYtrxAp/M5zMIQ==
@@ -384,6 +411,13 @@ multicast-dns@^7.2.2:
   dependencies:
     dns-packet "^5.2.2"
     thunky "^1.0.2"
+
+mutexify@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/mutexify/-/mutexify-1.4.0.tgz#b7f4ac0273c81824b840887c6a6e0bfab14bbe94"
+  integrity sha512-pbYSsOrSB/AKN5h/WzzLRMFgZhClWccf2XIB4RSMC8JbquiB0e0/SH5AIfdQMdyHmYtv4seU7yV/TvAwPLJ1Yg==
+  dependencies:
+    queue-tick "^1.0.0"
 
 nanoassert@^2.0.0:
   version "2.0.0"
@@ -437,7 +471,7 @@ once@^1.3.1, once@^1.4.0:
   dependencies:
     wrappy "1"
 
-protocol-buffers-encodings@^1.1.0:
+protocol-buffers-encodings@^1.1.0, protocol-buffers-encodings@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/protocol-buffers-encodings/-/protocol-buffers-encodings-1.2.0.tgz#39900b85dcff3172a23f15bdf3fda70daa2b38d3"
   integrity sha512-daeNPuKh1NlLD1uDfbLpD+xyUTc07nEtfHwmBZmt/vH0B7VOM+JOCOpDcx9ZRpqHjAiIkGqyTDi+wfGSl17R9w==
@@ -527,6 +561,11 @@ readable-stream@^3.0.2:
     inherits "^2.0.3"
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
+
+ready-resource@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ready-resource/-/ready-resource-1.0.0.tgz#8c07ee72da72d530bd2fd6b834b3ff0b03bbaaba"
+  integrity sha512-9/Oj3DXv+QxWinvVcxVVRXn9Jj4b9wssv0PvQh5bO+N/vzqo6kmScUNl+faWWMEu0rYMPa6Tvp50+rP5ujZvqg==
 
 record-cache@^1.1.0, record-cache@^1.1.1:
   version "1.2.0"

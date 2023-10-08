@@ -1,36 +1,47 @@
 "use strict";
 
-const hypercore = require("hypercore");
 const RPC = require("@hyperswarm/rpc");
-const swarm = require("@hyperswarm/network")();
+const DHT = require("hyperdht");
+const Hypercore = require("hypercore");
+const Hyperbee = require("hyperbee");
 const crypto = require("crypto");
 const Auction = require("./model/auction");
 const auctions = new Map();
-const rpcServer = new RPC();
 
 const main = async () => {
-  const feed = new hypercore("./db/auction-log");
-
-  console.log("Initializing feed...");
-
-  await new Promise((resolve, reject) => {
-    feed.ready((err) => {
-      if (err) {
-        console.error("Error initializing feed:", err);
-        reject(err);
-        return;
-      }
-      console.log("Feed initialized.");
-      resolve();
-    });
+  const hcore = new Hypercore("./db/rpc-server");
+  const hbee = new Hyperbee(hcore, {
+    keyEncoding: "utf-8",
+    valueEncoding: "binary",
   });
+  await hbee.ready();
 
-  console.log(`Server public key: ${feed.key.toString("hex")}`);
+  let dhtSeed = (await hbee.get("dht-seed"))?.value;
+  if (!dhtSeed) {
+    dhtSeed = crypto.randomBytes(32);
+    await hbee.put("dht-seed", dhtSeed);
+  }
 
-  swarm.join(feed.discoveryKey, {
-    lookup: true,
-    announce: true,
+  const dht = new DHT({
+    port: 40001,
+    keyPair: DHT.keyPair(dhtSeed),
+    bootstrap: [{ host: "127.0.0.1", port: 30001 }],
   });
+  await dht.ready();
+
+  let rpcSeed = (await hbee.get("rpc-seed"))?.value;
+  if (!rpcSeed) {
+    rpcSeed = crypto.randomBytes(32);
+    await hbee.put("rpc-seed", rpcSeed);
+  }
+
+  const rpc = new RPC({ seed: rpcSeed, dht });
+  const rpcServer = rpc.createServer();
+  await rpcServer.listen();
+  console.log(
+    "rpc server started listening on public key:",
+    rpcServer.publicKey.toString("hex")
+  );
 
   const createNewAuction = (clientId, item, startingPrice) => {
     const auctionId = crypto.randomBytes(16).toString("hex");
@@ -80,56 +91,6 @@ const main = async () => {
     return auction.highestBid;
   };
 
-  swarm.on("connection", (connection, details) => {
-    connection.on("data", async (data) => {
-      try {
-        const message = JSON.parse(data.toString());
-
-        switch (message.type) {
-          case "createAuction":
-            const auctionId = createNewAuction(
-              message.clientId,
-              message.item,
-              message.startingPrice
-            );
-            connection.write(
-              JSON.stringify({ type: "createAuctionResponse", auctionId })
-            );
-            break;
-
-          case "makeBid":
-            const success = placeBid(
-              message.clientId,
-              message.auctionId,
-              message.amount
-            );
-            connection.write(
-              JSON.stringify({ type: "makeBidResponse", success })
-            );
-            break;
-
-          case "closeAuction":
-            const highestBid = closeAnAuction(message.auctionId);
-            connection.write(
-              JSON.stringify({ type: "closeAuctionResponse", highestBid })
-            );
-            break;
-
-          default:
-            connection.write(
-              JSON.stringify({ type: "error", message: "Unknown command" })
-            );
-            break;
-        }
-      } catch (error) {
-        console.error("Error in connection data event:", error.message);
-        connection.write(
-          JSON.stringify({ type: "error", message: error.message })
-        );
-      }
-    });
-  });
-
   rpcServer.respond("createAuction", async (reqRaw) => {
     try {
       const req = JSON.parse(reqRaw.toString("utf-8"));
@@ -141,8 +102,7 @@ const main = async () => {
       auctions.set(auctionId, auction);
 
       const resp = { auctionId };
-      const respRaw = Buffer.from(JSON.stringify(resp), "utf-8");
-      return respRaw;
+      return Buffer.from(JSON.stringify(resp), "utf-8");
     } catch (error) {
       console.error("Error handling createAuction:", error.message);
       return Buffer.from(JSON.stringify({ error: error.message }), "utf-8");
@@ -153,32 +113,42 @@ const main = async () => {
     const activeAuctions = Array.from(auctions.values()).filter(
       (a) => !a.closed
     );
-    const respRaw = Buffer.from(JSON.stringify(activeAuctions), "utf-8");
-    return respRaw;
+    return Buffer.from(JSON.stringify(activeAuctions), "utf-8");
   });
 
   rpcServer.respond("makeBid", async (reqRaw) => {
-    const req = JSON.parse(reqRaw.toString("utf-8"));
-    const auction = auctions.get(req.auctionId);
-    if (auction && !auction.closed && req.amount > auction.highestBid.amount) {
-      auction.addBid(req.clientId, req.amount);
-      const resp = { success: true };
-      return Buffer.from(JSON.stringify(resp), "utf-8");
+    try {
+      const req = JSON.parse(reqRaw.toString("utf-8"));
+      const auction = auctions.get(req.auctionId);
+      if (
+        auction &&
+        !auction.closed &&
+        req.amount > auction.highestBid.amount
+      ) {
+        auction.addBid(req.clientId, req.amount);
+        return Buffer.from(JSON.stringify({ success: true }), "utf-8");
+      }
+      return Buffer.from(JSON.stringify({ success: false }), "utf-8");
+    } catch (error) {
+      console.error("Error handling makeBid:", error.message);
+      return Buffer.from(JSON.stringify({ error: error.message }), "utf-8");
     }
-    return Buffer.from(JSON.stringify({ success: false }), "utf-8");
   });
 
   rpcServer.respond("closeAuction", async (reqRaw) => {
-    const req = JSON.parse(reqRaw.toString("utf-8"));
-    const auction = auctions.get(req.auctionId);
-    if (auction && !auction.closed) {
-      auction.closed = true;
-      const resp = {
-        highestBid: auction.highestBid,
-      };
-      return Buffer.from(JSON.stringify(resp), "utf-8");
+    try {
+      const req = JSON.parse(reqRaw.toString("utf-8"));
+      const auction = auctions.get(req.auctionId);
+      if (auction && !auction.closed) {
+        auction.closed = true;
+        const resp = { highestBid: auction.highestBid };
+        return Buffer.from(JSON.stringify(resp), "utf-8");
+      }
+      return Buffer.from(JSON.stringify({ success: false }), "utf-8");
+    } catch (error) {
+      console.error("Error handling closeAuction:", error.message);
+      return Buffer.from(JSON.stringify({ error: error.message }), "utf-8");
     }
-    return Buffer.from(JSON.stringify({ success: false }), "utf-8");
   });
 
   process.on("SIGINT", () => {
@@ -187,11 +157,7 @@ const main = async () => {
       if (err) console.error("Error shutting down rpcServer:", err);
       else console.log("rpcServer shut down successfully.");
     });
-    swarm.destroy((err) => {
-      if (err) console.error("Error shutting down swarm:", err);
-      else console.log("Swarm shut down successfully.");
-      process.exit();
-    });
+    process.exit();
   });
 };
 
