@@ -23,9 +23,7 @@ const main = async () => {
   }
 
   const dht = new DHT({
-    port: 40001,
     keyPair: DHT.keyPair(dhtSeed),
-    bootstrap: [{ host: "127.0.0.1", port: 30001 }],
   });
   await dht.ready();
 
@@ -37,13 +35,6 @@ const main = async () => {
 
   const rpc = new RPC({ seed: rpcSeed, dht });
   const rpcServer = rpc.createServer();
-
-  rpcServer.on("connection", (connection) => {
-    console.log(
-      "Client connected with remotePublicKey:",
-      connection.remotePublicKey.toString("hex")
-    );
-  });
 
   await rpcServer.listen();
   console.log(
@@ -65,6 +56,7 @@ const main = async () => {
   rpcServer.respond("createAuction", async (reqRaw) => {
     try {
       const req = JSON.parse(reqRaw.toString("utf-8"));
+      console.log("Server get req createAuction:", req);
       if (!req.clientId || !req.item || !req.startingPrice) {
         throw new Error("Invalid request");
       }

@@ -31,9 +31,7 @@ const main = async () => {
   }
 
   const dht = new DHT({
-    port: 50001,
     keyPair: DHT.keyPair(dhtSeed),
-    bootstrap: [{ host: "127.0.0.1", port: 30001 }],
   });
   await dht.ready();
 
@@ -46,14 +44,11 @@ const main = async () => {
   const resp = JSON.parse(respRaw.toString("utf-8"));
   console.log(resp);
 
-  await rpc.destroy();
-  await dht.destroy();
   cli();
 };
 
 const createAuction = async (clientId, item, startingPrice) => {
   const payload = { clientId, item, startingPrice };
-  console.log(`Requesting to make a bid of amount: ${startingPrice}`);
   const respRaw = await rpc.request(
     serverPubKey,
     "createAuction",

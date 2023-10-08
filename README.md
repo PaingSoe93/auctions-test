@@ -34,25 +34,25 @@ The client has several commands available:
 Create an Auction
 
 ```
-node rpc-client.js createAuction <clientId> <itemName> <startingPrice>
+node rpc-client.js <ServerPubKey> createAuction <clientId> <itemName> <startingPrice>
 ```
 
 Example
 
 ```
-node rpc-client.js createAuction client123 "Test Item" 100
+node rpc-client.js <ServerPubKey> createAuction client123 "Test Item" 100
 ```
 
 Get Active Auctions
 
 ```
-node rpc-client.js getAuctions
+node rpc-client.js <ServerPubKey> getAuctions
 ```
 
 Make a Bid
 
 ```
-node rpc-client.js makeBid <clientId> <auctionId> <bidAmount>
+node rpc-client.js <ServerPubKey> makeBid <clientId> <auctionId> <bidAmount>
 ```
 
 Example
