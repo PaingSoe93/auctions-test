@@ -18,22 +18,100 @@ const main = async () => {
     announce: true,
   });
 
-  swarm.on("connection", (connection, details) => {
-    connection.on("data", (data) => {
-      const message = JSON.parse(data.toString());
+  const createNewAuction = (clientId, item, startingPrice) => {
+    const auctionId = crypto.randomBytes(16).toString("hex");
+    const auction = new Auction(clientId, item, startingPrice);
+    auctions.set(auctionId, auction);
+    feed.append(
+      JSON.stringify({
+        action: "createAuction",
+        auctionId,
+        clientId,
+        item,
+        startingPrice,
+      })
+    );
+    return auctionId;
+  };
 
-      switch (message.type) {
-        case "createAuction":
-          // ... handle auction creation ...
-          break;
-        case "makeBid":
-          // ... handle bid ...
-          break;
-        case "closeAuction":
-          // ... handle auction closure ...
-          break;
-        default:
-          break;
+  const placeBid = (clientId, auctionId, amount) => {
+    const auction = auctions.get(auctionId);
+    if (!auction || auction.closed) return false;
+
+    const success = auction.addBid(clientId, amount);
+    if (success) {
+      feed.append(
+        JSON.stringify({
+          action: "makeBid",
+          auctionId,
+          clientId,
+          amount,
+        })
+      );
+    }
+    return success;
+  };
+
+  const closeAnAuction = (auctionId) => {
+    const auction = auctions.get(auctionId);
+    if (!auction || auction.closed) return null;
+
+    auction.closed = true;
+    feed.append(
+      JSON.stringify({
+        action: "closeAuction",
+        auctionId,
+      })
+    );
+    return auction.highestBid;
+  };
+
+  swarm.on("connection", (connection, details) => {
+    connection.on("data", async (data) => {
+      try {
+        const message = JSON.parse(data.toString());
+
+        switch (message.type) {
+          case "createAuction":
+            const auctionId = createNewAuction(
+              message.clientId,
+              message.item,
+              message.startingPrice
+            );
+            connection.write(
+              JSON.stringify({ type: "createAuctionResponse", auctionId })
+            );
+            break;
+
+          case "makeBid":
+            const success = placeBid(
+              message.clientId,
+              message.auctionId,
+              message.amount
+            );
+            connection.write(
+              JSON.stringify({ type: "makeBidResponse", success })
+            );
+            break;
+
+          case "closeAuction":
+            const highestBid = closeAnAuction(message.auctionId);
+            connection.write(
+              JSON.stringify({ type: "closeAuctionResponse", highestBid })
+            );
+            break;
+
+          default:
+            connection.write(
+              JSON.stringify({ type: "error", message: "Unknown command" })
+            );
+            break;
+        }
+      } catch (error) {
+        console.error("Error in connection data event:", error.message);
+        connection.write(
+          JSON.stringify({ type: "error", message: error.message })
+        );
       }
     });
   });
@@ -87,6 +165,21 @@ const main = async () => {
       return Buffer.from(JSON.stringify(resp), "utf-8");
     }
     return Buffer.from(JSON.stringify({ success: false }), "utf-8");
+  });
+
+  process.on("SIGINT", () => {
+    console.log("\nGracefully shutting down from SIGINT (Ctrl+C)");
+    rpcServer.destroy((err) => {
+      if (err) console.error("Error shutting down rpcServer:", err);
+      else console.log("rpcServer shut down successfully.");
+    });
+    swarm.destroy((err) => {
+      if (err) console.error("Error shutting down swarm:", err);
+      else console.log("Swarm shut down successfully.");
+
+      // Only exit after all cleanup logic has completed
+      process.exit();
+    });
   });
 };
 
