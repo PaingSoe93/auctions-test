@@ -151,12 +151,8 @@ const main = async () => {
     }
   });
 
-  process.on("SIGINT", () => {
+  process.on("SIGINT", async () => {
     console.log("\nGracefully shutting down from SIGINT (Ctrl+C)");
-    rpcServer.destroy((err) => {
-      if (err) console.error("Error shutting down rpcServer:", err);
-      else console.log("rpcServer shut down successfully.");
-    });
     process.exit();
   });
 };
