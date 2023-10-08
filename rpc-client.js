@@ -39,11 +39,21 @@ const main = async () => {
 
   rpc = new RPC({ dht });
 
+  const payload = { nonce: 126 };
+  const payloadRaw = Buffer.from(JSON.stringify(payload), "utf-8");
+
+  const respRaw = await rpc.request(serverPubKey, "ping", payloadRaw);
+  const resp = JSON.parse(respRaw.toString("utf-8"));
+  console.log(resp);
+
+  await rpc.destroy();
+  await dht.destroy();
   cli();
 };
 
 const createAuction = async (clientId, item, startingPrice) => {
   const payload = { clientId, item, startingPrice };
+  console.log(`Requesting to make a bid of amount: ${startingPrice}`);
   const respRaw = await rpc.request(
     serverPubKey,
     "createAuction",
@@ -69,18 +79,6 @@ const makeBid = async (clientId, auctionId, amount) => {
   return resp.success;
 };
 
-const sendToSwarm = (message) => {
-  feed.append(JSON.stringify(message), (err) => {
-    if (err) throw err;
-
-    swarm.connections.forEach((peer) => {
-      if (peer.remotePublicKey !== feed.key) {
-        peer.send(Buffer.from(JSON.stringify(message)));
-      }
-    });
-  });
-};
-
 const closeAuction = async (auctionId) => {
   const payload = { auctionId };
   const respRaw = await rpc.request(
@@ -93,13 +91,18 @@ const closeAuction = async (auctionId) => {
 };
 
 const cli = async () => {
-  const command = process.argv[2];
+  const command = process.argv[3];
+
+  console.log(command);
 
   switch (command) {
     case "createAuction":
-      const clientId = process.argv[3];
-      const item = process.argv[4];
-      const startingPrice = parseInt(process.argv[5], 10);
+      const clientId = process.argv[4];
+      const item = process.argv[5];
+      const startingPrice = parseInt(process.argv[6], 10);
+      console.log(
+        `${clientId} Creating auction for ${item} with starting price ${startingPrice}`
+      );
       const auctionId = await createAuction(clientId, item, startingPrice);
       console.log(`Auction created with ID: ${auctionId}`);
       break;
@@ -110,15 +113,15 @@ const cli = async () => {
       break;
 
     case "makeBid":
-      const bidClientId = process.argv[3];
-      const bidAuctionId = process.argv[4];
-      const amount = parseInt(process.argv[5], 10);
+      const bidClientId = process.argv[4];
+      const bidAuctionId = process.argv[5];
+      const amount = parseInt(process.argv[6], 10);
       const bidSuccess = await makeBid(bidClientId, bidAuctionId, amount);
       console.log("Bid successful:", bidSuccess);
       break;
 
     case "closeAuction":
-      const closeAuctionId = process.argv[3];
+      const closeAuctionId = process.argv[4];
       const highestBidAfterClosure = await closeAuction(closeAuctionId);
       console.log("Highest bid after auction closure:", highestBidAfterClosure);
       break;
@@ -129,8 +132,6 @@ const cli = async () => {
       );
       break;
   }
-  await rpc.destroy();
-  await dht.destroy();
 };
 
 main().catch(console.error);

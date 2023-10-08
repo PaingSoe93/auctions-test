@@ -37,59 +37,30 @@ const main = async () => {
 
   const rpc = new RPC({ seed: rpcSeed, dht });
   const rpcServer = rpc.createServer();
+
+  rpcServer.on("connection", (connection) => {
+    console.log(
+      "Client connected with remotePublicKey:",
+      connection.remotePublicKey.toString("hex")
+    );
+  });
+
   await rpcServer.listen();
   console.log(
     "rpc server started listening on public key:",
     rpcServer.publicKey.toString("hex")
   );
 
-  const createNewAuction = (clientId, item, startingPrice) => {
-    const auctionId = crypto.randomBytes(16).toString("hex");
-    const auction = new Auction(clientId, item, startingPrice);
-    auctions.set(auctionId, auction);
-    feed.append(
-      JSON.stringify({
-        action: "createAuction",
-        auctionId,
-        clientId,
-        item,
-        startingPrice,
-      })
-    );
-    return auctionId;
-  };
+  rpcServer.respond("ping", async (reqRaw) => {
+    // reqRaw is Buffer, we need to parse it
+    const req = JSON.parse(reqRaw.toString("utf-8"));
 
-  const placeBid = (clientId, auctionId, amount) => {
-    const auction = auctions.get(auctionId);
-    if (!auction || auction.closed) return false;
+    const resp = { nonce: req.nonce + 1 };
 
-    const success = auction.addBid(clientId, amount);
-    if (success) {
-      feed.append(
-        JSON.stringify({
-          action: "makeBid",
-          auctionId,
-          clientId,
-          amount,
-        })
-      );
-    }
-    return success;
-  };
-
-  const closeAnAuction = (auctionId) => {
-    const auction = auctions.get(auctionId);
-    if (!auction || auction.closed) return null;
-
-    auction.closed = true;
-    feed.append(
-      JSON.stringify({
-        action: "closeAuction",
-        auctionId,
-      })
-    );
-    return auction.highestBid;
-  };
+    // we also need to return buffer response
+    const respRaw = Buffer.from(JSON.stringify(resp), "utf-8");
+    return respRaw;
+  });
 
   rpcServer.respond("createAuction", async (reqRaw) => {
     try {
@@ -153,6 +124,8 @@ const main = async () => {
 
   process.on("SIGINT", async () => {
     console.log("\nGracefully shutting down from SIGINT (Ctrl+C)");
+    await rpcServer.close();
+    await dht.destroy();
     process.exit();
   });
 };
