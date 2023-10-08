@@ -5,6 +5,7 @@ const DHT = require("hyperdht");
 const Hypercore = require("hypercore");
 const Hyperbee = require("hyperbee");
 const crypto = require("crypto");
+const readline = require("readline");
 
 let rpc;
 let serverPubKey;
@@ -108,48 +109,65 @@ const closeAuction = async (auctionId) => {
   return resp.highestBid;
 };
 
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  prompt: "RPC-CLI> ",
+});
+
 const cli = async () => {
-  const command = process.argv[3];
+  rl.prompt();
+  rl.on("line", async (line) => {
+    const args = line
+      .trim()
+      .split(" ")
+      .map((arg) => arg.trim());
+    switch (args[0]) {
+      case "createAuction":
+        if (args.length !== 4) {
+          console.error("Incorrect number of arguments for createAuction");
+          break;
+        }
+        const clientId = args[1];
+        const item = args[2];
+        const startingPrice = parseInt(args[3], 10);
+        console.log(
+          `${clientId} Creating auction for ${item} with starting price ${startingPrice}`
+        );
+        const auctionId = await createAuction(clientId, item, startingPrice);
+        console.log(`Auction created with ID: ${auctionId}`);
+        break;
 
-  console.log(command);
+      case "getAuctions":
+        const auctions = await getAuctions();
+        console.log("Active auctions:", auctions);
+        break;
 
-  switch (command) {
-    case "createAuction":
-      const clientId = process.argv[4];
-      const item = process.argv[5];
-      const startingPrice = parseInt(process.argv[6], 10);
-      console.log(
-        `${clientId} Creating auction for ${item} with starting price ${startingPrice}`
-      );
-      const auctionId = await createAuction(clientId, item, startingPrice);
-      console.log(`Auction created with ID: ${auctionId}`);
-      break;
+      case "makeBid":
+        const bidClientId = args[1];
+        const bidAuctionId = args[2];
+        const amount = parseInt(args[3], 10);
+        const bidSuccess = await makeBid(bidClientId, bidAuctionId, amount);
+        console.log("Bid successful:", bidSuccess);
+        break;
 
-    case "getAuctions":
-      const auctions = await getAuctions();
-      console.log("Active auctions:", auctions);
-      break;
+      case "closeAuction":
+        const closeAuctionId = args[4];
+        const highestBidAfterClosure = await closeAuction(closeAuctionId);
+        console.log(
+          "Highest bid after auction closure:",
+          highestBidAfterClosure
+        );
+        break;
 
-    case "makeBid":
-      const bidClientId = process.argv[4];
-      const bidAuctionId = process.argv[5];
-      const amount = parseInt(process.argv[6], 10);
-      const bidSuccess = await makeBid(bidClientId, bidAuctionId, amount);
-      console.log("Bid successful:", bidSuccess);
-      break;
-
-    case "closeAuction":
-      const closeAuctionId = process.argv[4];
-      const highestBidAfterClosure = await closeAuction(closeAuctionId);
-      console.log("Highest bid after auction closure:", highestBidAfterClosure);
-      break;
-
-    default:
-      console.error(
-        "Unknown command. Available commands are: createAuction, getAuctions, makeBid, closeAuction."
-      );
-      break;
-  }
+      default:
+        console.error(
+          "Unknown command. Available commands are: createAuction, getAuctions, makeBid, closeAuction."
+        );
+        break;
+    }
+    rl.prompt();
+  });
 };
 
 main().catch(console.error);

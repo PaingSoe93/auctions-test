@@ -80,12 +80,12 @@ const main = async () => {
       auctions.set(auctionId, auction);
 
       const resp = { auctionId };
-      broadcastToClients("auctionCreated", {
-        clientId: req.clientId,
-        item: req.item,
-        startingPrice: req.startingPrice,
-        auctionId,
-      });
+      // broadcastToClients("auctionCreated", {
+      //   clientId: req.clientId,
+      //   item: req.item,
+      //   startingPrice: req.startingPrice,
+      //   auctionId,
+      // });
       return Buffer.from(JSON.stringify(resp), "utf-8");
     } catch (error) {
       console.error("Error handling createAuction:", error.message);
@@ -135,12 +135,12 @@ const main = async () => {
     }
   });
 
-  process.on("SIGINT", async () => {
-    console.log("\nGracefully shutting down from SIGINT (Ctrl+C)");
-    await rpcServer.close();
-    await dht.destroy();
-    process.exit();
-  });
+  // process.on("SIGINT", async () => {
+  //   console.log("\nGracefully shutting down from SIGINT (Ctrl+C)");
+  //   await rpcServer.close();
+  //   await dht.destroy();
+  //   process.exit();
+  // });
 };
 
 main().catch(console.error);

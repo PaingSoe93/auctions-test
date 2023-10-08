@@ -29,46 +29,52 @@ yarn start:server
 
 ### Using the Client CLI
 
+Connect client to Server
+
+```
+node rpc-client.js <ServerPubKey>
+```
+
 The client has several commands available:
 
 Create an Auction
 
 ```
-node rpc-client.js <ServerPubKey> createAuction <clientId> <itemName> <startingPrice>
+createAuction <clientId> <itemName> <startingPrice>
 ```
 
 Example
 
 ```
-node rpc-client.js <ServerPubKey> createAuction client123 "Test Item" 100
+createAuction client123 "TestItem" 100
 ```
 
 Get Active Auctions
 
 ```
-node rpc-client.js <ServerPubKey> getAuctions
+getAuctions
 ```
 
 Make a Bid
 
 ```
-node rpc-client.js <ServerPubKey> makeBid <clientId> <auctionId> <bidAmount>
+makeBid <clientId> <auctionId> <bidAmount>
 ```
 
 Example
 
 ```
-node rpc-client.js <ServerPubKey> makeBid client123 auctionId123 150
+makeBid client123 auctionId123 150
 ```
 
 Close an Auction
 
 ```
-node rpc-client.js <ServerPubKey> closeAuction <auctionId>
+closeAuction <auctionId>
 ```
 
 Example
 
 ```
-node rpc-client.js <ServerPubKey> closeAuction auctionId123
+closeAuction auctionId123
 ```
