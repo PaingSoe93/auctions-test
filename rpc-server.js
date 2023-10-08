@@ -7,6 +7,7 @@ const Hyperbee = require("hyperbee");
 const crypto = require("crypto");
 const Auction = require("./model/auction");
 const auctions = new Map();
+const connectedClients = new Set();
 
 const main = async () => {
   const hcore = new Hypercore("./db/rpc-server");
@@ -36,6 +37,13 @@ const main = async () => {
   const rpc = new RPC({ seed: rpcSeed, dht });
   const rpcServer = rpc.createServer();
 
+  rpcServer.on("connection", (client) => {
+    connectedClients.add(client);
+    client.on("end", () => {
+      connectedClients.delete(client);
+    });
+  });
+
   await rpcServer.listen();
   console.log(
     "rpc server started listening on public key:",
@@ -53,6 +61,13 @@ const main = async () => {
     return respRaw;
   });
 
+  function broadcastToClients(event, data) {
+    const payloadRaw = Buffer.from(JSON.stringify(data), "utf-8");
+    for (let client of connectedClients) {
+      rpc.request(client.remotePublicKey, event, payloadRaw);
+    }
+  }
+
   rpcServer.respond("createAuction", async (reqRaw) => {
     try {
       const req = JSON.parse(reqRaw.toString("utf-8"));
@@ -65,6 +80,12 @@ const main = async () => {
       auctions.set(auctionId, auction);
 
       const resp = { auctionId };
+      broadcastToClients("auctionCreated", {
+        clientId: req.clientId,
+        item: req.item,
+        startingPrice: req.startingPrice,
+        auctionId,
+      });
       return Buffer.from(JSON.stringify(resp), "utf-8");
     } catch (error) {
       console.error("Error handling createAuction:", error.message);

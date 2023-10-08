@@ -58,17 +58,17 @@ node rpc-client.js <ServerPubKey> makeBid <clientId> <auctionId> <bidAmount>
 Example
 
 ```
-node rpc-client.js makeBid client123 auctionId123 150
+node rpc-client.js <ServerPubKey> makeBid client123 auctionId123 150
 ```
 
 Close an Auction
 
 ```
-node rpc-client.js closeAuction <auctionId>
+node rpc-client.js <ServerPubKey> closeAuction <auctionId>
 ```
 
 Example
 
 ```
-node rpc-client.js closeAuction auctionId123
+node rpc-client.js <ServerPubKey> closeAuction auctionId123
 ```
